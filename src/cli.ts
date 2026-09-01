@@ -5,17 +5,18 @@ import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
 import { advertise, type Advertisement } from "./mdns.js";
 import { scanLineForPort } from "./detectPort.js";
-import { resolveAppName } from "./name.js";
+import { resolveAppName, sanitizeLabel } from "./name.js";
+import { parseArgs } from "./args.js";
 
-const HELP = `Usage: applan [--] <command> [args...]
+const HELP = `Usage: applan [options] [--] <command> [args...]
 
 Runs <command> (typically your normal dev-server command, e.g. "npm run dev")
 and additionally advertises it on your LAN as http://<appname>.local:<port>,
 using mDNS (Bonjour/Zeroconf) so other devices on the same WiFi — phones,
 tablets, other computers — can reach it by name instead of by IP address.
 
-<appname> comes from the "name" field of the nearest package.json, or the
-current folder name if there isn't one.
+<appname> defaults to the "name" field of the nearest package.json, or the
+current folder name if there isn't one; override it with --name.
 
 No admin/sudo privileges are required, and nothing is persisted: the mDNS
 advertisement exists only while <command> is running and is withdrawn the
@@ -24,11 +25,12 @@ moment it exits.
 Examples:
   applan -- npm run dev
   applan npm run dev
-  applan -- vite --host
+  applan --name myapp -- vite --host
 
 Options:
-  -h, --help       Show this help
-  --version        Show the installed version
+  -n, --name <name>   Use this name instead of auto-detecting one
+  -h, --help          Show this help
+  --version           Show the installed version
 `;
 
 function readVersion(): string {
@@ -45,27 +47,26 @@ function readVersion(): string {
 
 async function main(): Promise<void> {
   const argv = process.argv.slice(2);
+  const parsed = parseArgs(argv);
 
-  if (argv.length === 0 || argv[0] === "--help" || argv[0] === "-h") {
+  if (parsed.kind === "help") {
     process.stdout.write(HELP);
-    process.exitCode = argv.length === 0 ? 1 : 0;
     return;
   }
-  if (argv[0] === "--version") {
+  if (parsed.kind === "version") {
     process.stdout.write(`${readVersion()}\n`);
     return;
   }
-
-  const commandArgs = argv[0] === "--" ? argv.slice(1) : argv;
-  if (commandArgs.length === 0) {
-    process.stderr.write("applan: no command given\n\n");
+  if (parsed.kind === "error") {
+    process.stderr.write(`applan: ${parsed.message}\n\n`);
     process.stdout.write(HELP);
     process.exitCode = 1;
     return;
   }
 
-  const [cmd, ...cmdArgs] = commandArgs;
-  const appName = resolveAppName(process.cwd());
+  const [cmd, ...cmdArgs] = parsed.commandArgs;
+  const appName =
+    parsed.name !== undefined ? sanitizeLabel(parsed.name) : resolveAppName(process.cwd());
 
   const child = spawn(cmd, cmdArgs, {
     stdio: ["inherit", "pipe", "pipe"],

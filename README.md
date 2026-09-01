@@ -39,13 +39,15 @@ Examples:
 applan -- npm run dev
 applan -- vite --host
 applan -- next dev
+applan --name myapp -- npm run dev    # override the auto-detected name
 ```
 
 `applan` runs your command exactly as you normally would — output, colors,
 exit codes are all passed through unchanged — and additionally:
 
 1. Figures out an app name from the `name` field in the nearest
-   `package.json` (or the current folder name if there isn't one).
+   `package.json`, or the current folder name if there isn't one — or use
+   `--name`/`-n` to set it explicitly.
 2. Watches the command's output for the port it started on (recognizes the
    `Local: http://localhost:PORT` banner printed by Vite, Create React App,
    Next.js, Astro, SvelteKit, and most plain Node servers).
@@ -93,6 +95,13 @@ This package is intentionally minimal-privilege:
   (AirPlay, printers, Chromecasts, etc.), not a hidden behavior of this
   tool. Don't use it to advertise something you don't want discoverable on
   a shared or untrusted network.
+
+The `.local` suffix itself isn't configurable — that's a hard requirement
+of mDNS (RFC 6762), not a missing feature. Browsers and OSes only send
+multicast discovery queries for `.local` names; a different suffix like
+`appname.dev` would need a real DNS record somewhere, which this
+zero-privilege, nothing-persisted tool deliberately doesn't create. `--name`
+controls the part before `.local`.
 
 There is no "drop the port entirely" mode (e.g. plain `http://appname.local`
 with no port). That would require binding port 80/443, which needs elevated
