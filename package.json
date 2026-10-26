@@ -1,6 +1,6 @@
 {
   "name": "applan",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "Give your npm/Vite/CRA/Next dev server a friendly LAN-visible name (http://appname.local:PORT) instead of hunting for an IP address. Zero privilege, zero persisted state.",
   "type": "module",
   "bin": {
@@ -31,8 +31,8 @@
   ],
   "license": "MIT",
   "dependencies": {
-    "bonjour-service": "^1.2.1",
-    "cross-spawn": "^7.0.6"
+    "cross-spawn": "^7.0.6",
+    "multicast-dns": "^7.2.5"
   },
   "devDependencies": {
     "@types/cross-spawn": "^6.0.6",
