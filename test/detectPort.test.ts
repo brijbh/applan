@@ -30,6 +30,11 @@ describe("scanLineForPort", () => {
     expect(scanLineForPort("Listening on http://0.0.0.0:4000")).toBe(4000);
   });
 
+  it("recognizes custom HTTPS server hostnames", () => {
+    expect(scanLineForPort("> Beagle production server ready on https://beagle:3000")).toBe(3000);
+    expect(scanLineForPort("Server ready at https://my-app.local:3443")).toBe(3443);
+  });
+
   it("returns undefined for unrelated lines", () => {
     expect(scanLineForPort("Compiled successfully!")).toBeUndefined();
     expect(scanLineForPort("")).toBeUndefined();
