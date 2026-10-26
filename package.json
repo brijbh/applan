@@ -1,6 +1,6 @@
 {
   "name": "applan",
-  "version": "0.1.1",
+  "version": "0.1.2",
   "description": "Give your npm/Vite/CRA/Next dev server a friendly LAN-visible name (http://appname.local:PORT) instead of hunting for an IP address. Zero privilege, zero persisted state.",
   "type": "module",
   "bin": {
