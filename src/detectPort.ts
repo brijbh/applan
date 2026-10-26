@@ -2,7 +2,7 @@
  * Matches the "Local: http://localhost:PORT/" style banner printed by
  * Vite, CRA, Next.js, Astro, SvelteKit, and most plain http.listen logs.
  */
-const PORT_BANNER = /https?:\/\/(?:localhost|127\.0\.0\.1|0\.0\.0\.0|\[::1?\]|\d{1,3}(?:\.\d{1,3}){3}):(\d{2,5})\b/i;
+const PORT_BANNER = /https?:\/\/(?:[a-z0-9][a-z0-9.-]*|\[::1?\]):(\d{2,5})\b/i;
 
 /**
  * Strips ANSI SGR color codes (e.g. `\x1b[1m`). Tools like Vite colorize
