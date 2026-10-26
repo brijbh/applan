@@ -81,7 +81,7 @@ export function advertise(name: string, port: number): Advertisement {
     const asked = packet.questions ?? [];
     const matched = records.filter((record) =>
       asked.some((question) =>
-        question.name.toLowerCase().replace(/\\.$/, "") === record.name.toLowerCase()
+        question.name.toLowerCase().replace(/\.$/, "") === record.name.toLowerCase()
         && (question.type === record.type || question.type === "ANY")
       )
     );
