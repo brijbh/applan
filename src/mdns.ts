@@ -1,6 +1,8 @@
-import mdnsFactory from "multicast-dns";
+import { createRequire } from "node:module";
 import { networkInterfaces } from "node:os";
 import { isIP } from "node:net";
+
+const require = createRequire(import.meta.url);
 
 export interface Advertisement {
   hostname: string;
@@ -23,6 +25,8 @@ type MdnsInstance = {
   respond(packet: { answers: RecordData[]; additionals?: RecordData[] }, done?: () => void): void;
   destroy(done?: () => void): void;
 };
+
+const mdnsFactory = require("multicast-dns") as (options: { multicast: boolean; reuseAddr: boolean }) => MdnsInstance;
 
 /**
  * Don't advertise Docker (172.17.*), Tailscale (100.64/10), VPN, or
@@ -55,7 +59,7 @@ export function recordsFor(name: string, port: number, address: string): RecordD
   return [
     { name: "_http._tcp.local", type: "PTR", ttl: 120, data: service },
     { name: service, type: "SRV", ttl: 120, data: { priority: 0, weight: 0, port, target: hostname } },
-    { name: service, type: "TXT", ttl: 120, data: Buffer.from("") },
+    { name: service, type: "TXT", ttl: 120, data: Buffer.from([0]) },
     { name: hostname, type: "A", ttl: 120, data: address },
   ];
 }
